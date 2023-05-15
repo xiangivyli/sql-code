@@ -28,15 +28,16 @@ CREATE TABLE universities (
 
 -- Insert selected data (distinct)
 INSERT INTO professors
-SELECT DISTINCT firstname,
-       familyname,
+SELECT DISTINCT firstname, 
+                lastname, 
+				university_shortname 
 FROM university_professors;
 
 
 INSERT INTO universities
 SELECT DISTINCT university_shortname,
-       university,
-	   university_city
+                university,
+	            university_city
 FROM university_professors;
 
 /*Step 3, Drop the old table*/
