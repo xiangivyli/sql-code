@@ -71,3 +71,4 @@ CHAR(3);
 ALTER TABLE professors
 ALTER COLUMN firstname
 VARCHAR(64);
+
