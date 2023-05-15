@@ -62,4 +62,12 @@ FROM university_professors;
 
 /*Step 4, Adjust datatype */
 
+-- Change the datatype for short_name to fix length at 3
+ALTER TABLE professors
+ALTER COLUMN university_shortname
+CHAR(3);
 
+-- Change the first name to 64 maximum
+ALTER TABLE professors
+ALTER COLUMN firstname
+VARCHAR(64);
