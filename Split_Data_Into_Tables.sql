@@ -40,6 +40,6 @@ SELECT DISTINCT university_shortname,
 	            university_city
 FROM university_professors;
 
-/*Step 3, Drop the old table*/
-DROP TABLE university_professors;
+/*Step 3, Drop the old table */
+--DROP TABLE university_professors;
 
