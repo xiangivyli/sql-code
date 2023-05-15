@@ -1,28 +1,45 @@
 
 
 
-/*Step 1, Create 4 empty tables*/
+/*Step 1, Create empty tables*/
 
--- Create a table for the professors entity type
-CREATE TABLE professors (
- firstname text,
- lastname text
+-- Table professor: create a table for the professors entity type, U means User Table
+IF OBJECT_ID('professors', 'U') IS NULL
+BEGIN
+   CREATE TABLE professors(
+     firstname text,
+     lastname text
 );
+END
 
--- Add the university_shortname column
-ALTER TABLE professors
-ADD university_shortname text;
+-- Add a column: add the university_shortname column, N indicates a Unicode string literal
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE Name = N'university_shortname' AND OBJECT_ID = Object_ID(N'professors'))
+BEGIN
+    ALTER TABLE professors
+    ADD university_shortname text;
+END;
 
 -- Change the column name
-EXEC sp_rename 'professors.lastname', 'familyname', 'COLUMN';
+IF EXISTS (
+    SELECT 1
+    FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_NAME = 'professors'
+    AND COLUMN_NAME = 'lastname'
+)
+BEGIN
+    EXEC sp_rename 'professors.lastname', 'familyname', 'COLUMN';
+END
 
 
--- Create a table for the universities entity type
-CREATE TABLE universities (
-    university_shortname text,
-    university text,
-    university_city text
+--	Table universities: create a table for the universities entity type
+IF OBJECT_ID('universities', 'U') IS NULL
+BEGIN
+    CREATE TABLE universities (
+         university_shortname text,
+         university text,
+         university_city text
 );
+END
 
 /*Step 2, Migrate data from old table*/
 
@@ -42,4 +59,7 @@ FROM university_professors;
 
 /*Step 3, Drop the old table */
 --DROP TABLE university_professors;
+
+/*Step 4, Adjust datatype */
+
 
