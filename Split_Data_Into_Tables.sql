@@ -16,6 +16,7 @@ ADD university_shortname text;
 -- Change the column name
 EXEC sp_rename 'professors.lastname', 'familyname', 'COLUMN';
 
+
 -- Create a table for the universities entity type
 CREATE TABLE universities (
     university_shortname text,
@@ -35,7 +36,9 @@ FROM university_professors;
 INSERT INTO universities
 SELECT DISTINCT university_shortname,
        university,
-	   university
+	   university_city
 FROM university_professors;
 
+/*Step 3, Drop the old table*/
+DROP TABLE university_professors;
 
