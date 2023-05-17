@@ -93,3 +93,10 @@ ALTER COLUMN university_shortname CHAR(3) NOT NULL;
 -- Set unique key for universities table
 ALTER TABLE universities
 ADD CONSTRAINT unishortnameunique UNIQUE (university_shortname);
+
+-- Change the constraint name
+ALTER TABLE universities
+DROP CONSTRAINT unishortnameunique
+
+ALTER TABLE universities
+ADD CONSTRAINT uni_shortname_unique UNIQUE (university_shortname);
