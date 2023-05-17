@@ -60,10 +60,14 @@ FROM university_professors;
 /*Step 3, Drop the old table */
 --DROP TABLE university_professors;
 
-/*Step 4, Adjust datatype */
+/*Step 4, Adjust constrants, datatype, unique, null */
 
 -- Change the datatype for short_name to fix length at 3
 ALTER TABLE professors
+ALTER COLUMN university_shortname
+CHAR(3);
+
+ALTER TABLE universities
 ALTER COLUMN university_shortname
 CHAR(3);
 
@@ -72,3 +76,20 @@ ALTER TABLE professors
 ALTER COLUMN firstname
 VARCHAR(64);
 
+-- Set not null columns
+ALTER TABLE professors
+ALTER COLUMN firstname text NOT NULL;
+
+ALTER TABLE professors
+ALTER COLUMN familyname text NOT NULL;
+
+ALTER TABLE professors
+ALTER COLUMN university_shortname CHAR(3) NOT NULL;
+
+ALTER TABLE universities
+ALTER COLUMN university_shortname CHAR(3) NOT NULL;
+
+
+-- Set unique key for universities table
+ALTER TABLE universities
+ADD CONSTRAINT unishortnameunique UNIQUE (university_shortname);
