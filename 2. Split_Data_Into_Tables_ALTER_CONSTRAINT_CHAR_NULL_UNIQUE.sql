@@ -41,6 +41,26 @@ BEGIN
 );
 END
 
+-- Table affiliations: create a table for the relationship between professors and organisations
+IF OBJECT_ID('affiliations', 'U') IS NULL
+BEGIN
+    CREATE TABLE affiliations (
+	     firstname text,
+		 familyname text,
+		 organisation text,
+		 [function] text
+);
+END
+
+-- Table organisations: create a table for the organisation entity type
+IF OBJECT_ID('organisations', 'U') IS NULL
+BEGIN
+   CREATE TABLE organisations (
+         organisation text,
+		 organisation_sector text
+);
+END
+
 /*Step 2, Migrate data from old table*/
 
 -- Insert selected data (distinct)
@@ -56,6 +76,18 @@ SELECT DISTINCT university_shortname,
                 university,
 	            university_city
 FROM university_professors;
+
+INSERT INTO organisations
+SELECT DISTINCT organization,
+                organization_sector
+FROM university_professors; 
+
+INSERT INTO affiliations
+SELECT DISTINCT firstname,
+                lastname,
+				organization,
+				[function]
+FROM university_professors; 
 
 /*Step 3, Drop the old table */
 --DROP TABLE university_professors;
