@@ -92,7 +92,7 @@ FROM university_professors;
 /*Step 3, Drop the old table */
 --DROP TABLE university_professors;
 
-/*Step 4, Adjust constraints, datatype, unique, null */
+/*Step 4, Adjust constraints, datatype, unique, null, primary key */
 
 -- 4a Datatype: Change the datatype for short_name to fix length at 3
 ALTER TABLE professors
@@ -142,3 +142,8 @@ ADD id INT IDENTITY(1,1) CONSTRAINT PK_affiliations PRIMARY KEY;
 ALTER TABLE organisations
 ADD id INT IDENTITY(1,1) CONSTRAINT PK_organisations PRIMARY KEY;
 
+/*Step 5, foreign key, build relationship */
+
+-- 1:N from professors to universities
+ALTER TABLE professors
+ADD CONSTRAINT professors_fkey FOREIGN KEY (university_shortname) REFERENCES universities (university_shortname);
