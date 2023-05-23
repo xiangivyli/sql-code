@@ -3,7 +3,7 @@
 
 /*Step 1, Create empty tables*/
 
--- Table professor: create a table for the professors entity type, U means User Table
+-- 1a Table professor: create a table for the professors entity type, U means User Table
 IF OBJECT_ID('professors', 'U') IS NULL
 BEGIN
    CREATE TABLE professors(
@@ -12,14 +12,14 @@ BEGIN
 );
 END
 
--- Add a column: add the university_shortname column, N indicates a Unicode string literal
+-- 1a1 Add a column: add the university_shortname column, N indicates a Unicode string literal
 IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE Name = N'university_shortname' AND OBJECT_ID = Object_ID(N'professors'))
 BEGIN
     ALTER TABLE professors
     ADD university_shortname text;
 END;
 
--- Change the column name
+-- 1a2 Change the column name
 IF EXISTS (
     SELECT 1
     FROM INFORMATION_SCHEMA.COLUMNS
@@ -31,7 +31,7 @@ BEGIN
 END
 
 
---	Table universities: create a table for the universities entity type
+--	1b Table universities: create a table for the universities entity type
 IF OBJECT_ID('universities', 'U') IS NULL
 BEGIN
     CREATE TABLE universities (
@@ -41,7 +41,7 @@ BEGIN
 );
 END
 
--- Table affiliations: create a table for the relationship between professors and organisations
+-- 1c Table affiliations: create a table for the relationship between professors and organisations
 IF OBJECT_ID('affiliations', 'U') IS NULL
 BEGIN
     CREATE TABLE affiliations (
@@ -52,7 +52,7 @@ BEGIN
 );
 END
 
--- Table organisations: create a table for the organisation entity type
+-- 1d Table organisations: create a table for the organisation entity type
 IF OBJECT_ID('organisations', 'U') IS NULL
 BEGIN
    CREATE TABLE organisations (
@@ -92,9 +92,9 @@ FROM university_professors;
 /*Step 3, Drop the old table */
 --DROP TABLE university_professors;
 
-/*Step 4, Adjust constrants, datatype, unique, null */
+/*Step 4, Adjust constraints, datatype, unique, null */
 
--- Change the datatype for short_name to fix length at 3
+-- 4a Datatype: Change the datatype for short_name to fix length at 3
 ALTER TABLE professors
 ALTER COLUMN university_shortname
 CHAR(3);
@@ -103,12 +103,7 @@ ALTER TABLE universities
 ALTER COLUMN university_shortname
 CHAR(3);
 
--- Change the first name to 64 maximum
-ALTER TABLE professors
-ALTER COLUMN firstname
-VARCHAR(64);
-
--- Set not null columns
+-- 4b nullable: Set not null columns
 ALTER TABLE professors
 ALTER COLUMN firstname text NOT NULL;
 
@@ -122,7 +117,7 @@ ALTER TABLE universities
 ALTER COLUMN university_shortname CHAR(3) NOT NULL;
 
 
--- Set unique key for universities table
+-- 4c Unique: Set unique key for universities table
 ALTER TABLE universities
 ADD CONSTRAINT unishortnameunique UNIQUE (university_shortname);
 
@@ -132,3 +127,18 @@ DROP CONSTRAINT unishortnameunique
 
 ALTER TABLE universities
 ADD CONSTRAINT uni_shortname_unique UNIQUE (university_shortname);
+
+-- 4d Primary Key: Add primary key
+ALTER TABLE universities
+ADD CONSTRAINT PK_universities PRIMARY KEY (university_shortname);
+
+-- 4e Surrogate Key: Add surrogate keys for the three tables
+ALTER TABLE professors
+ADD id INT IDENTITY(1,1) CONSTRAINT PK_professors PRIMARY KEY;
+
+ALTER TABLE affiliations
+ADD id INT IDENTITY(1,1) CONSTRAINT PK_affiliations PRIMARY KEY;
+
+ALTER TABLE organisations
+ADD id INT IDENTITY(1,1) CONSTRAINT PK_organisations PRIMARY KEY;
+
