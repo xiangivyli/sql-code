@@ -132,12 +132,9 @@ ADD CONSTRAINT uni_shortname_unique UNIQUE (university_shortname);
 ALTER TABLE universities
 ADD CONSTRAINT PK_universities PRIMARY KEY (university_shortname);
 
--- 4e Surrogate Key: Add surrogate keys for the three tables
+-- 4e Surrogate Key: Add surrogate keys for professors and organisations, no affiliations
 ALTER TABLE professors
 ADD id INT IDENTITY(1,1) CONSTRAINT PK_professors PRIMARY KEY;
-
-ALTER TABLE affiliations
-ADD id INT IDENTITY(1,1) CONSTRAINT PK_affiliations PRIMARY KEY;
 
 ALTER TABLE organisations
 ADD id INT IDENTITY(1,1) CONSTRAINT PK_organisations PRIMARY KEY;
@@ -147,3 +144,8 @@ ADD id INT IDENTITY(1,1) CONSTRAINT PK_organisations PRIMARY KEY;
 -- 1:N from professors to universities
 ALTER TABLE professors
 ADD CONSTRAINT professors_fkey FOREIGN KEY (university_shortname) REFERENCES universities (university_shortname);
+
+-- N:M relationship from professors to organisations with affiliations table
+ALTER TABLE affiliations
+ADD professor_id INT,
+    CONSTRAINT fk_affiliations_professors FOREIGN KEY (professors_id) REFERENCES professors(id);
