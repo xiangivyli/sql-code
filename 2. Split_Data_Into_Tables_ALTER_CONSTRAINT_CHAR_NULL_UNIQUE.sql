@@ -194,3 +194,20 @@ DROP COLUMN familyname;
 ALTER TABLE affiliations
 ADD CONSTRAINT affiliations_fkey FOREIGN KEY (organisation_id) REFERENCES organisations(organisation_id);
 
+-- Identify the correct constraint name
+SELECT constraint_name, table_name, constraint_type
+FROM INFORMATION_SCHEMA.table_constraints
+WHERE constraint_type = 'FOREIGN KEY';
+
+-- Drop the right forign key constraint
+ALTER TABLE professors
+DROP CONSTRAINT professors_universities_shortname_fkey;
+
+-- Add a new foreign key constraint from professors to universities which ACTION deletion
+ALTER TABLE professors
+ADD CONSTRAINT professors_universities_shortname_fkey FOREIGN KEY (university_shortname) 
+               REFERENCES universities (university_shortname) ON DELETE NO ACTION;
+
+-- Check the referential integrity 
+DELETE FROM professors
+WHERE firstname = 'Alain';
