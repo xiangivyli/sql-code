@@ -103,6 +103,27 @@ ALTER TABLE universities
 ALTER COLUMN university_shortname
 CHAR(3);
 
+ALTER TABLE organisations
+ALTER COLUMN organisation
+VARCHAR(256);
+
+ALTER TABLE professors
+ALTER COLUMN firstname
+VARCHAR(68); 
+
+ALTER TABLE professors
+ALTER COLUMN familyname
+VARCHAR(68); 
+
+ALTER TABLE affiliations
+ALTER COLUMN firstname
+VARCHAR(68);
+
+ALTER TABLE affiliations
+ALTER COLUMN familyname
+VARCHAR(68);
+
+
 -- 4b nullable: Set not null columns
 ALTER TABLE professors
 ALTER COLUMN firstname text NOT NULL;
@@ -115,6 +136,9 @@ ALTER COLUMN university_shortname CHAR(3) NOT NULL;
 
 ALTER TABLE universities
 ALTER COLUMN university_shortname CHAR(3) NOT NULL;
+
+ALTER TABLE organisations
+ALTER COLUMN organisation VARCHAR(256) NOT NULL;
 
 
 -- 4c Unique: Set unique key for universities table
@@ -132,12 +156,14 @@ ADD CONSTRAINT uni_shortname_unique UNIQUE (university_shortname);
 ALTER TABLE universities
 ADD CONSTRAINT PK_universities PRIMARY KEY (university_shortname);
 
--- 4e Surrogate Key: Add surrogate keys for professors and organisations, no affiliations
+EXEC sp_rename 'organisations.organisation', 'organisation_id', 'COLUMN';
+ALTER TABLE organisations
+ADD CONSTRAINT PK_orgaisations PRIMARY KEY(organisation_id);
+
+
+-- 4e Surrogate Key: Add surrogate keys for professors
 ALTER TABLE professors
 ADD id INT IDENTITY(1,1) CONSTRAINT PK_professors PRIMARY KEY;
-
-ALTER TABLE organisations
-ADD id INT IDENTITY(1,1) CONSTRAINT PK_organisations PRIMARY KEY;
 
 /*Step 5, foreign key, build relationship */
 
@@ -148,4 +174,23 @@ ADD CONSTRAINT professors_fkey FOREIGN KEY (university_shortname) REFERENCES uni
 -- N:M relationship from professors to organisations with affiliations table
 ALTER TABLE affiliations
 ADD professor_id INT,
-    CONSTRAINT fk_affiliations_professors FOREIGN KEY (professors_id) REFERENCES professors(id);
+    CONSTRAINT fk_affiliations_professors FOREIGN KEY (professor_id) REFERENCES professors(id);
+
+-- populate professor_id in affiliations
+UPDATE affiliations
+SET professor_id = professors.id
+FROM affiliations
+JOIN professors ON affiliations.firstname = professors.firstname
+                AND affiliations.familyname = professors.familyname;
+
+--Drop firstname and family name because there has been ids
+ALTER TABLE affiliations
+DROP COLUMN firstname;
+
+ALTER TABLE affiliations
+DROP COLUMN familyname;
+
+-- 
+ALTER TABLE affiliations
+ADD CONSTRAINT affiliations_fkey FOREIGN KEY (organisation_id) REFERENCES organisations(organisation_id);
+
