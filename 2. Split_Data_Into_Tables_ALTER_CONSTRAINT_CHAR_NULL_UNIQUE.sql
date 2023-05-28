@@ -89,16 +89,6 @@ SELECT DISTINCT firstname,
 				[function]
 FROM university_professors; 
 
-
-;WITH CTE AS (
-  SELECT organisation, organisation_sector
-         RN = ROW_NUMBER() OVER (PARTITION BY organisation, organisation_sector ORDER BY (SELECT NULL))
-  FROM dbo.organisations
-)
-DELETE FROM CTE WHERE RN > 1;
-
-
-
 /*Step 3, Drop the old table */
 --DROP TABLE university_professors;
 
@@ -113,25 +103,25 @@ ALTER TABLE universities
 ALTER COLUMN university_shortname
 CHAR(3);
 
-ALTER TABLE organisations
+ALTER TABLE professors
+ALTER COLUMN firstname
+VARCHAR(68); 
+
+ALTER TABLE professors
+ALTER COLUMN familyname
+VARCHAR(68); 
+
+ALTER TABLE affiliations
+ALTER COLUMN firstname
+VARCHAR(68);
+
+ALTER TABLE affiliations
+ALTER COLUMN familyname
+VARCHAR(68);
+
+ALTER TABLE affiliations
 ALTER COLUMN organisation
 VARCHAR(256);
-
-ALTER TABLE professors
-ALTER COLUMN firstname
-VARCHAR(68); 
-
-ALTER TABLE professors
-ALTER COLUMN familyname
-VARCHAR(68); 
-
-ALTER TABLE affiliations
-ALTER COLUMN firstname
-VARCHAR(68);
-
-ALTER TABLE affiliations
-ALTER COLUMN familyname
-VARCHAR(68);
 
 
 -- 4b nullable: Set not null columns
@@ -177,7 +167,7 @@ ADD id INT IDENTITY(1,1) CONSTRAINT PK_professors PRIMARY KEY;
 
 /*Step 5, foreign key, build relationship */
 
--- 1:N from professors to universities
+-- 1:N from universities to professors
 ALTER TABLE professors
 ADD CONSTRAINT professors_fkey FOREIGN KEY (university_shortname) REFERENCES universities (university_shortname);
 
@@ -200,9 +190,11 @@ DROP COLUMN firstname;
 ALTER TABLE affiliations
 DROP COLUMN familyname;
 
--- 
+-- 1:N from orgaisations to affiliations
 ALTER TABLE affiliations
-ADD CONSTRAINT affiliations_fkey FOREIGN KEY (organisation_id) REFERENCES organisations(organisation_id);
+ADD CONSTRAINT affiliations_orgaisations_fkey FOREIGN KEY (organisation_id) 
+REFERENCES organisations(organisation_id)
+WITH NOCHECK;
 
 -- Identify the correct constraint name
 SELECT constraint_name, table_name, constraint_type
