@@ -156,7 +156,17 @@ ADD CONSTRAINT uni_shortname_unique UNIQUE (university_shortname);
 ALTER TABLE universities
 ADD CONSTRAINT PK_universities PRIMARY KEY (university_shortname);
 
+
+-- 4d1 Delete duplicate records from organisations
 EXEC sp_rename 'organisations.organisation', 'organisation_id', 'COLUMN';
+;WITH CTE AS (
+  SELECT *,
+         ROW_NUMBER() OVER (PARTITION BY organisation_id, organisation_sector ORDER BY (SELECT 0)) AS RN
+  FROM organisations
+)
+DELETE FROM CTE
+WHERE RN > 1;
+
 ALTER TABLE organisations
 ADD CONSTRAINT PK_orgaisations PRIMARY KEY(organisation_id);
 
@@ -169,9 +179,11 @@ ADD id INT IDENTITY(1,1) CONSTRAINT PK_professors PRIMARY KEY;
 
 -- 1:N from universities to professors
 ALTER TABLE professors
-ADD CONSTRAINT professors_fkey FOREIGN KEY (university_shortname) REFERENCES universities (university_shortname);
+ADD CONSTRAINT fk_professors_universities FOREIGN KEY (university_shortname) REFERENCES universities (university_shortname);
 
 -- N:M relationship from professors to organisations with affiliations table
+
+-- 1:N from professors to affiliations with professor_id
 ALTER TABLE affiliations
 ADD professor_id INT,
     CONSTRAINT fk_affiliations_professors FOREIGN KEY (professor_id) REFERENCES professors(id);
@@ -190,11 +202,10 @@ DROP COLUMN firstname;
 ALTER TABLE affiliations
 DROP COLUMN familyname;
 
--- 1:N from orgaisations to affiliations
+-- 1:N from organisations to affiliations
 ALTER TABLE affiliations
-ADD CONSTRAINT affiliations_orgaisations_fkey FOREIGN KEY (organisation_id) 
-REFERENCES organisations(organisation_id)
-WITH NOCHECK;
+ADD CONSTRAINT fk_affiliations_orgaisations FOREIGN KEY (organisation) 
+REFERENCES organisations(organisation_id);
 
 -- Identify the correct constraint name
 SELECT constraint_name, table_name, constraint_type
@@ -203,11 +214,11 @@ WHERE constraint_type = 'FOREIGN KEY';
 
 -- Drop the right forign key constraint
 ALTER TABLE professors
-DROP CONSTRAINT professors_universities_shortname_fkey;
+DROP CONSTRAINT fk_professors_universities;
 
 -- Add a new foreign key constraint from professors to universities which ACTION deletion
 ALTER TABLE professors
-ADD CONSTRAINT professors_universities_shortname_fkey FOREIGN KEY (university_shortname) 
+ADD CONSTRAINT fk_professors_universities FOREIGN KEY (university_shortname) 
                REFERENCES universities (university_shortname) ON DELETE NO ACTION;
 
 -- Check the referential integrity 
