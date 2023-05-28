@@ -56,8 +56,8 @@ END
 IF OBJECT_ID('organisations', 'U') IS NULL
 BEGIN
    CREATE TABLE organisations (
-         organisation text,
-		 organisation_sector text
+         organisation VARCHAR(256),
+		 organisation_sector VARCHAR(128)
 );
 END
 
@@ -88,6 +88,16 @@ SELECT DISTINCT firstname,
 				organization,
 				[function]
 FROM university_professors; 
+
+
+;WITH CTE AS (
+  SELECT organisation, organisation_sector
+         RN = ROW_NUMBER() OVER (PARTITION BY organisation, organisation_sector ORDER BY (SELECT NULL))
+  FROM dbo.organisations
+)
+DELETE FROM CTE WHERE RN > 1;
+
+
 
 /*Step 3, Drop the old table */
 --DROP TABLE university_professors;
