@@ -152,12 +152,12 @@ DROP CONSTRAINT unishortnameunique
 ALTER TABLE universities
 ADD CONSTRAINT uni_shortname_unique UNIQUE (university_shortname);
 
--- 4d Primary Key: Add primary key for universities
+-- 4d1 Primary Key: Add primary key for universities
 ALTER TABLE universities
 ADD CONSTRAINT PK_universities PRIMARY KEY (university_shortname);
 
 
--- 4d1 Delete duplicate records from organisations
+-- 4d2 Delete duplicate records from organisations and add primary key
 EXEC sp_rename 'organisations.organisation', 'organisation_id', 'COLUMN';
 ;WITH CTE AS (
   SELECT *,
@@ -177,13 +177,13 @@ ADD id INT IDENTITY(1,1) CONSTRAINT PK_professors PRIMARY KEY;
 
 /*Step 5, foreign key, build relationship */
 
--- 1:N from universities to professors
+-- 5a 1:N from universities to professors
 ALTER TABLE professors
 ADD CONSTRAINT fk_professors_universities FOREIGN KEY (university_shortname) REFERENCES universities (university_shortname);
 
--- N:M relationship from professors to organisations with affiliations table
+-- 5b N:M relationship from professors to organisations with affiliations table
 
--- 1:N from professors to affiliations with professor_id
+-- 5b1 1:N from professors to affiliations with professor_id
 ALTER TABLE affiliations
 ADD professor_id INT,
     CONSTRAINT fk_affiliations_professors FOREIGN KEY (professor_id) REFERENCES professors(id);
@@ -202,12 +202,12 @@ DROP COLUMN firstname;
 ALTER TABLE affiliations
 DROP COLUMN familyname;
 
--- 1:N from organisations to affiliations
+-- 5b2 1:N from organisations to affiliations
 ALTER TABLE affiliations
 ADD CONSTRAINT fk_affiliations_orgaisations FOREIGN KEY (organisation) 
 REFERENCES organisations(organisation_id);
 
--- Identify the correct constraint name
+-- 5c Identify the correct constraint name
 SELECT constraint_name, table_name, constraint_type
 FROM INFORMATION_SCHEMA.table_constraints
 WHERE constraint_type = 'FOREIGN KEY';
