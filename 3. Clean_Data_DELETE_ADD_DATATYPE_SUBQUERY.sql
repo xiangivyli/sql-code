@@ -15,7 +15,7 @@ ORDER BY total_deaths;
 DELETE FROM [PortfolioProject].[dbo].[CovidDeathsCountry]
 WHERE total_deaths IS NULL OR continent IS NULL;
 
--- Step1.2: Delete columns that are not used
+-- Step1.2: Delete columns that are not used in the final version
 
 ALTER TABLE [PortfolioProject].[dbo].[CovidDeathsCountry]
 DROP COLUMN continent;

@@ -31,7 +31,7 @@ BEGIN
 END
 
 
---	1b Table universities: create a table for the universities entity type
+-- 1b Table universities: create a table for the universities entity type
 IF OBJECT_ID('universities', 'U') IS NULL
 BEGIN
     CREATE TABLE universities (
@@ -152,7 +152,7 @@ DROP CONSTRAINT unishortnameunique
 ALTER TABLE universities
 ADD CONSTRAINT uni_shortname_unique UNIQUE (university_shortname);
 
--- 4d Primary Key: Add primary key
+-- 4d Primary Key: Add primary key for universities
 ALTER TABLE universities
 ADD CONSTRAINT PK_universities PRIMARY KEY (university_shortname);
 
