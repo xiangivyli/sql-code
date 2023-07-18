@@ -168,7 +168,7 @@ DELETE FROM CTE
 WHERE RN > 1;
 
 ALTER TABLE organisations
-ADD CONSTRAINT PK_orgaisations PRIMARY KEY(organisation_id);
+ADD CONSTRAINT PK_organisations PRIMARY KEY(organisation_id);
 
 
 -- 4e Surrogate Key: Add surrogate keys for professors
